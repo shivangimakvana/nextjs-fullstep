@@ -6,20 +6,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
 import { useSession } from 'next-auth/react';
 import { Loader2, RefreshCcw } from 'lucide-react';
-
-import MessageCard from '@/components/MessageCard';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/components/ui/use-toast';
-
+import { useToast } from '@/components/ui/use-toast';િન
 import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
 import type { Message } from '@/model/User';
 import type { ApiResponse } from '@/types/ApiResponse';
 import type { User } from 'next-auth';
 
 function UserDashboard() {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
   const [profileUrl, setProfileUrl] = useState('');
@@ -109,37 +105,6 @@ function UserDashboard() {
       setIsSwitchLoading(false);
     }
   };
-
-  // Delete a message
-  const handleDeleteMessage = async (id: string) => {
-    try {
-      const res = await fetch(`/api/messages/${id}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setMessages((prev) => prev.filter((m) => m._id !== id));
-        toast({
-          title: 'Deleted',
-          description: data.message || 'Message removed.',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: data.message || 'Failed to delete message',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: (error as Error)?.message || 'Unexpected error occurred',
-        variant: 'destructive',
-      });
-    }
-  };
-
   // Set profile URL
   useEffect(() => {
     if (session?.user) {
