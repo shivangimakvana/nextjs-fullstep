@@ -232,6 +232,7 @@ function UserDashboard() {
           <p>No messages to display.</p>
         )}
       </div>
+      <div></div>
     </div>
   );
 }
