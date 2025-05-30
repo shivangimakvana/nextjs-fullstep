@@ -9,7 +9,7 @@ import { Loader2, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/components/ui/use-toast';િન
+import { useToast } from '@/components/ui/use-toast';
 import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
 import type { Message } from '@/model/User';
 import type { ApiResponse } from '@/types/ApiResponse';
