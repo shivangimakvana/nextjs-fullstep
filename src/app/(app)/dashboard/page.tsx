@@ -42,7 +42,7 @@ function UserDashboard() {
     setIsSwitchLoading(true);
     try {
       const { data } = await axios.get<ApiResponse>('/api/accept-messages');
-      setValue('acceptMessages', data.isAcceptingMessages ?? false);
+      setValue('acceptMessages', data.isAccesptingMessages ?? false);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast({
@@ -131,10 +131,10 @@ function UserDashboard() {
           variant: 'destructive',
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error?.message || 'Unexpected error occurred',
+        description: (error as Error)?.message || 'Unexpected error occurred',
         variant: 'destructive',
       });
     }
@@ -224,7 +224,12 @@ function UserDashboard() {
           messages.map((msg) => (
             <MessageCard
               key={msg._id as string}
-              message={msg}
+              message={{
+                ...msg,
+                _id: msg._id as string,
+                text: (msg as any).text ?? '',
+                name: (msg as any).name ?? '',
+              }}
               onMessageDelete={handleDeleteMessage}
             />
           ))
