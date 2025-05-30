@@ -219,24 +219,8 @@ function UserDashboard() {
       </Button>
 
       {/* Messages List */}
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {messages.length > 0 ? (
-          messages.map((msg) => (
-            <MessageCard
-              key={msg._id as string}
-              message={{
-                ...msg,
-                _id: msg._id as string,
-                text: (msg as any).text ?? '',
-                name: (msg as any).name ?? '',
-              }}
-              onMessageDelete={handleDeleteMessage}
-            />
-          ))
-        ) : (
-          <p>No messages to display.</p>
-        )}
-      </div>
+  
+
     </div>
   );
 }
