@@ -11,7 +11,6 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
-import type { Message } from '@/model/User';
 import type { ApiResponse } from '@/types/ApiResponse';
 import type { User } from 'next-auth';
 

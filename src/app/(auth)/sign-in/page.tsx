@@ -5,15 +5,21 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
-
 import { useRouter } from 'next/navigation';
 import { signInSchema } from '@/schemas/signInSchema';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { signIn } from 'next-auth/react';
 
-const page = () => {
+const Page = () => {
   const { toast } = useToast();
   const router = useRouter();
 
@@ -33,26 +39,21 @@ const page = () => {
         password: data.password,
       });
 
-      console.log('Sign-in result:', result); // Debugging: Log the result
-
-      if (!result) {
-        throw new Error('No response from server');
-      }
+      if (!result) throw new Error('No response from server');
 
       if (result.error) {
         toast({
           title: 'Login failed',
-          description: result.error || 'Invalid email/username or password',
+          description: result.error || 'Invalid credentials',
           variant: 'destructive',
         });
       } else if (result.url) {
         router.replace('/dashboard');
       }
     } catch (error) {
-      console.error('Sign-in error:', error); // Debugging: Log the error
       toast({
         title: 'Error',
-        description: 'An unexpected error occurred. Please try again later.',
+        description: 'Unexpected error. Try again later.',
         variant: 'destructive',
       });
     }
@@ -111,4 +112,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
