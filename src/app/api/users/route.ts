@@ -6,6 +6,6 @@ export async function GET() {
     const users = await UserModel.find().populate('messages').exec();
     return NextResponse.json(users);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+    return NextResponse.json({ error: error || 'Failed to fetch users' }, { status: 500 });
   }
 }

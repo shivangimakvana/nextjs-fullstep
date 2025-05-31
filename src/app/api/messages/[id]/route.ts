@@ -22,11 +22,13 @@ export async function DELETE(
     } else {
       return NextResponse.json({ success: false, message: 'Message not found' }, { status: 404 });
     }
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: 'Server error', error: error.message },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { success: false, message: 'Server error', error: error.message },
+        { status: 500 }
+      );
+    }
   }
 }
  

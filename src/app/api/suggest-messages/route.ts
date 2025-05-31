@@ -1,7 +1,7 @@
 import { console } from 'inspector';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     console.log('suggest-messages');
     const prompt = "Create a list of three open-ended and engaging questions formatted as a single string. Each question should be separated by '||'. These questions are for an anonymous social messaging platform, like Qooh.me, and should be suitable for a diverse audience. Avoid personal or sensitive topics, focusing instead on universal themes that encourage friendly interaction.";
@@ -45,7 +45,16 @@ export async function POST(req: NextRequest) {
     const message = data.choices[0].message.content;
 
     return NextResponse.json({ success: true, message });
-  } catch (err: any) {
-    return NextResponse.json({ success: false, message: 'Server error', error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown server error';
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Server error',
+        error: errorMessage,
+      },
+      { status: 500 }
+    );
   }
 }
