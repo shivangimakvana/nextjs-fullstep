@@ -1,4 +1,4 @@
-import { NextAuthOptions, Session } from 'next-auth';
+import { NextAuthOptions} from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
@@ -15,11 +15,6 @@ declare module 'next-auth' {
   }
 }
 
-// Define the shape of credentials
-type CredentialsType = {
-  identifier: string;
-  password: string;
-};
 
 // Define the shape of the returned user
 type AuthorizedUser = {
@@ -38,8 +33,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(
-        credentials: Record<"identifier" | "password", string> | undefined,
-        req: any
+        credentials: Record<"identifier" | "password", string> | undefined
       ): Promise<AuthorizedUser | null> {
         await dbConnect();
         try {
