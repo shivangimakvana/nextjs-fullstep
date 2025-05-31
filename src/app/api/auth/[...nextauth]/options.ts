@@ -4,7 +4,7 @@ import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
 import type { NextAuthConfig } from 'next-auth';
 
-// Extend Session types
+// Extend Session/User/JWT types
 declare module 'next-auth' {
   interface Session {
     user: {
@@ -27,7 +27,7 @@ declare module 'next-auth' {
   }
 }
 
-// Define the user shape returned after login
+// User shape
 type AuthorizedUser = {
   _id: string;
   email: string;
@@ -73,6 +73,10 @@ export const authOptions: NextAuthConfig = {
     }),
   ],
 
+  session: {
+    strategy: 'jwt',
+  },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -82,7 +86,6 @@ export const authOptions: NextAuthConfig = {
       }
       return token;
     },
-
     async session({ session, token }) {
       if (token && session.user) {
         session.user._id = token._id as string;
@@ -91,10 +94,6 @@ export const authOptions: NextAuthConfig = {
       }
       return session;
     },
-  },
-
-  session: {
-    strategy: 'jwt',
   },
 
   secret: process.env.NEXTAUTH_SECRET,
