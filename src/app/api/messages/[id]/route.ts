@@ -3,11 +3,14 @@ import dbConnect from '@/lib/dbConnect';
 import mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id } = context.params;
+interface Params {
+  params: {
+    id: string;
+  };
+}
+
+export async function DELETE(req: NextRequest, { params }: Params) {
+  const { id } = params;
 
   try {
     await dbConnect();
