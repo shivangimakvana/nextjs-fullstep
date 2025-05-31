@@ -4,12 +4,6 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
 
-// Define the shape of credentials
-type CredentialsType = {
-  identifier: string;
-  password: string;
-};
-
 // Define the shape of the returned user
 type AuthorizedUser = {
   id: string;
@@ -27,8 +21,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(
-        credentials: Record<"password" | "identifier", string> | undefined,
-        req?: any
+        credentials: Record<"password" | "identifier", string> | undefined
       ): Promise<AuthorizedUser | null> {
         await dbConnect();
         try {
