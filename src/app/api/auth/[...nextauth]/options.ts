@@ -2,7 +2,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
-import type { NextAuthConfig } from 'next-auth';
+import { NextAuth } from 'next-auth';
 
 // Extend Session/User/JWT types
 declare module 'next-auth' {
@@ -27,14 +27,13 @@ declare module 'next-auth' {
   }
 }
 
-// User shape
 type AuthorizedUser = {
   _id: string;
   email: string;
   username: string;
 };
 
-export const authOptions: NextAuthConfig = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -100,4 +99,4 @@ export const authOptions: NextAuthConfig = {
   pages: {
     signIn: '/sign-in',
   },
-};
+} satisfies Parameters<typeof NextAuth>[0]; // ✅ correct type assertion
