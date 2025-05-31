@@ -6,7 +6,7 @@ import UserModel from '@/model/User';
 export async function POST(request: Request) {
   await dbConnect();
 
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as { user?: { _id: string } } | null;
   if (!session || !session.user) {
     return Response.json(
       { success: false, message: 'Not authenticated' },
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 export async function GET() {
   await dbConnect();
 
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions) as { user?: { _id: string } } | null;
   if (!session || !session.user) {
     return Response.json(
       { success: false, message: 'Not authenticated' },
