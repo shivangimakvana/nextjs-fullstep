@@ -12,7 +12,6 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
 import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
 import type { ApiResponse } from '@/types/ApiResponse';
-import type { User } from 'next-auth';
 
 import type { Message } from '@/model/User';
 
@@ -101,9 +100,19 @@ function UserDashboard() {
     }
   };
 
+
+  type CustomUser = {
+    name?: string;
+    email?: string;
+    image?: string;
+    _id?: string;
+    username?: string;
+  };
+
   useEffect(() => {
     if (session?.user) {
-      const username = (session.user as any).username ?? '';
+      const user = session.user as CustomUser;
+      const username = user.username ?? '';
       const baseUrl =
         typeof window !== 'undefined'
           ? `${window.location.protocol}//${window.location.host}`
