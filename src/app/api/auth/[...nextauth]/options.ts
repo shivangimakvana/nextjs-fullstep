@@ -1,11 +1,10 @@
-import type { NextAuthOptions } from 'next-auth';
-
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
+import type { NextAuthConfig } from 'next-auth';
 
-// Extend the Session type to include username and _id
+// Extend Session types
 declare module 'next-auth' {
   interface Session {
     user: {
@@ -14,17 +13,28 @@ declare module 'next-auth' {
       username: string;
     };
   }
+
+  interface User {
+    _id: string;
+    email: string;
+    username: string;
+  }
+
+  interface JWT {
+    _id: string;
+    email: string;
+    username: string;
+  }
 }
 
-
-// Define the shape of the returned user
+// Define the user shape returned after login
 type AuthorizedUser = {
   _id: string;
   email: string;
   username: string;
 };
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthConfig = {
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -33,44 +43,32 @@ export const authOptions: NextAuthOptions = {
         identifier: { label: 'Email/Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(
-        credentials: Record<"identifier" | "password", string> | undefined
-      ): Promise<AuthorizedUser | null> {
+      async authorize(credentials) {
         await dbConnect();
-        try {
-          if (!credentials?.identifier || !credentials?.password) {
-            throw new Error('Missing credentials');
-          }
 
-          const user = await UserModel.findOne({
-            $or: [
-              { email: credentials.identifier },
-              { username: credentials.identifier },
-            ],
-          });
-
-          if (!user) {
-            return null;
-          }
-
-          const isPasswordCorrect =
-            user.password &&
-            (await bcrypt.compare(credentials.password, user.password));
-
-          if (!isPasswordCorrect) {
-            return null;
-          }
-
-          return {
-            id: user._id.toString(),
-            _id: user._id.toString(),
-            email: user.email,
-            username: user.username,
-          };
-        } catch (error) {
-          console.error('Authorize error:', error);
-          throw new Error('Internal server error');
+        if (!credentials?.identifier || !credentials?.password) {
+          throw new Error('Missing credentials');
         }
+
+        const user = await UserModel.findOne({
+          $or: [
+            { email: credentials.identifier },
+            { username: credentials.identifier },
+          ],
+        });
+
+        if (!user) return null;
+
+        const isPasswordCorrect =
+          user.password && (await bcrypt.compare(credentials.password, user.password));
+
+        if (!isPasswordCorrect) return null;
+
+        return {
+          _id: user._id.toString(),
+          email: user.email,
+          username: user.username,
+        };
       },
     }),
   ],
@@ -78,19 +76,18 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token._id = (user as unknown as AuthorizedUser)._id;
-        token.email = (user as unknown as AuthorizedUser).email;
-        token.username = (user as unknown as AuthorizedUser).username;
+        token._id = (user as AuthorizedUser)._id;
+        token.email = user.email;
+        token.username = user.username;
       }
       return token;
     },
+
     async session({ session, token }) {
-      if (token) {
-        session.user = {
-          _id: token._id as string,
-          email: token.email as string,
-          username: token.username as string,
-        };
+      if (token && session.user) {
+        session.user._id = token._id as string;
+        session.user.email = token.email as string;
+        session.user.username = token.username as string;
       }
       return session;
     },
@@ -101,7 +98,6 @@ export const authOptions: NextAuthOptions = {
   },
 
   secret: process.env.NEXTAUTH_SECRET,
-
   pages: {
     signIn: '/sign-in',
   },
