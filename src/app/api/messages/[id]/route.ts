@@ -5,15 +5,13 @@ import { ObjectId } from 'mongodb';
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = context.params;
 
   try {
-    // Ensure DB is connected
     await dbConnect();
 
-    // Validate ID
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, message: 'Invalid message ID' },
