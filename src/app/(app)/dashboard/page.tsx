@@ -103,12 +103,12 @@ function UserDashboard() {
 
   useEffect(() => {
     if (session?.user) {
-      const { username } = session.user as User;
+      const username = (session.user as any).username ?? '';
       const baseUrl =
         typeof window !== 'undefined'
           ? `${window.location.protocol}//${window.location.host}`
           : '';
-      setProfileUrl(`${baseUrl}/u/${username}`);
+      setProfileUrl(username ? `${baseUrl}/u/${username}` : '');
     }
   }, [session]);
 
