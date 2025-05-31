@@ -12,7 +12,7 @@ type CredentialsType = {
 
 // Define the shape of the returned user
 type AuthorizedUser = {
-  _id: string;
+  id: string;
   email: string;
   username: string;
 };
@@ -27,7 +27,8 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(
-        credentials: CredentialsType
+        credentials: Record<"password" | "identifier", string> | undefined,
+        req?: any
       ): Promise<AuthorizedUser | null> {
         await dbConnect();
         try {
@@ -55,7 +56,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           return {
-            _id: user._id.toString(),
+            id: user._id.toString(),
             email: user.email,
             username: user.username,
           };
@@ -70,7 +71,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token._id = (user as AuthorizedUser)._id;
+        token.id = (user as AuthorizedUser).id;
         token.email = (user as AuthorizedUser).email;
         token.username = (user as AuthorizedUser).username;
       }
@@ -79,7 +80,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user = {
-          _id: token._id as string,
+          id: token.id as string,
           email: token.email as string,
           username: token.username as string,
         };

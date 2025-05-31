@@ -184,17 +184,17 @@ function UserDashboard() {
         {messages.length === 0 ? (
           <p className="text-gray-500">No messages to display.</p>
         ) : (
-          <ul className="space-y-2">
-            {messages.map((msg) => (
-              <li
-                key={msg.id}
-                className="border p-3 rounded shadow-sm bg-gray-50 text-sm"
-              >
-                <p>{msg.content}</p>
-                {msg.sender && <p className="text-xs text-gray-500">From: {msg.sender}</p>}
-              </li>
-            ))}
-          </ul>
+        <ul className="space-y-2">
+          {messages.map((msg, idx) => (
+            <li
+              key={msg.id ?? idx}
+              className="border p-3 rounded shadow-sm bg-gray-50 text-sm"
+            >
+              <p>{msg.content}</p>
+              {msg.sender && <p className="text-xs text-gray-500">From: {msg.sender}</p>}
+            </li>
+          ))}
+        </ul>
         )}
       </div>
     </div>
