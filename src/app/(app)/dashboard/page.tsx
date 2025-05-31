@@ -15,6 +15,12 @@ import type { ApiResponse } from '@/types/ApiResponse';
 
 import type { Message } from '@/model/User';
 
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+
 function UserDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
@@ -206,7 +212,14 @@ function UserDashboard() {
         </ul>
         )}
       </div>
+      <HoverCard>
+        <HoverCardTrigger>Hover</HoverCardTrigger>
+        <HoverCardContent>
+          The React Framework – created and maintained by @vercel.
+        </HoverCardContent>
+      </HoverCard>
     </div>
+    
   );
 }
 
