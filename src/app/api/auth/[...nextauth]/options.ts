@@ -1,12 +1,29 @@
-import { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions, Session } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
 
+// Extend the Session type to include username and _id
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      _id: string;
+      email: string;
+      username: string;
+    };
+  }
+}
+
+// Define the shape of credentials
+type CredentialsType = {
+  identifier: string;
+  password: string;
+};
+
 // Define the shape of the returned user
 type AuthorizedUser = {
-  id: string;
+  _id: string;
   email: string;
   username: string;
 };
@@ -21,7 +38,8 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(
-        credentials: Record<"password" | "identifier", string> | undefined
+        credentials: Record<"identifier" | "password", string> | undefined,
+        req: any
       ): Promise<AuthorizedUser | null> {
         await dbConnect();
         try {
@@ -50,6 +68,7 @@ export const authOptions: NextAuthOptions = {
 
           return {
             id: user._id.toString(),
+            _id: user._id.toString(),
             email: user.email,
             username: user.username,
           };
@@ -64,16 +83,16 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = (user as AuthorizedUser).id;
-        token.email = (user as AuthorizedUser).email;
-        token.username = (user as AuthorizedUser).username;
+        token._id = (user as unknown as AuthorizedUser)._id;
+        token.email = (user as unknown as AuthorizedUser).email;
+        token.username = (user as unknown as AuthorizedUser).username;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user = {
-          id: token.id as string,
+          _id: token._id as string,
           email: token.email as string,
           username: token.username as string,
         };
