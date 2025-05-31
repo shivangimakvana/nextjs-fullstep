@@ -51,6 +51,7 @@ const Page = () => {
         router.replace('/dashboard');
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: 'Error',
         description: 'Unexpected error. Try again later.',
