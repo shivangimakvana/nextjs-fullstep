@@ -2,12 +2,13 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/options';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
+import type { Session } from 'next-auth';
 
 export async function POST(request: Request) {
   await dbConnect();
 
-  const session = await getServerSession(authOptions) as { user?: { _id: string } } | null;
-  if (!session || !session.user) {
+  const session = await getServerSession(authOptions) as Session | null;
+  if (!session?.user || !('user' in session)) {
     return Response.json(
       { success: false, message: 'Not authenticated' },
       { status: 401 }
