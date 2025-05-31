@@ -14,10 +14,13 @@ import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
 import type { ApiResponse } from '@/types/ApiResponse';
 import type { User } from 'next-auth';
 
+import type { Message } from '@/model/User';
+
 function UserDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSwitchLoading, setIsSwitchLoading] = useState(false);
   const [profileUrl, setProfileUrl] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const { toast } = useToast();
   const { data: session } = useSession();
@@ -32,7 +35,6 @@ function UserDashboard() {
   const { register, watch, setValue } = form;
   const acceptMessages = watch('acceptMessages');
 
-  // Fetch user's "accept messages" setting
   const fetchAcceptMessages = useCallback(async () => {
     setIsSwitchLoading(true);
     try {
@@ -42,8 +44,7 @@ function UserDashboard() {
       const axiosError = error as AxiosError<ApiResponse>;
       toast({
         title: 'Error',
-        description:
-          axiosError.response?.data.message || 'Failed to fetch setting',
+        description: axiosError.response?.data.message || 'Failed to fetch setting',
         variant: 'destructive',
       });
     } finally {
@@ -51,7 +52,6 @@ function UserDashboard() {
     }
   }, [setValue, toast]);
 
-  // Fetch user messages
   const fetchMessages = useCallback(
     async (refresh = false) => {
       setIsLoading(true);
@@ -68,8 +68,7 @@ function UserDashboard() {
         const axiosError = error as AxiosError<ApiResponse>;
         toast({
           title: 'Error',
-          description:
-            axiosError.response?.data.message || 'Failed to load messages',
+          description: axiosError.response?.data.message || 'Failed to load messages',
           variant: 'destructive',
         });
       } finally {
@@ -79,15 +78,13 @@ function UserDashboard() {
     [toast]
   );
 
-  // Toggle message acceptance
   const handleSwitchChange = async () => {
     const newValue = !acceptMessages;
     setIsSwitchLoading(true);
     try {
-      const { data } = await axios.post<ApiResponse>(
-        '/api/accept-messages',
-        { acceptMessages: newValue }
-      );
+      const { data } = await axios.post<ApiResponse>('/api/accept-messages', {
+        acceptMessages: newValue,
+      });
       setValue('acceptMessages', newValue);
       toast({
         title: data.message,
@@ -96,15 +93,14 @@ function UserDashboard() {
       const axiosError = error as AxiosError<ApiResponse>;
       toast({
         title: 'Error',
-        description:
-          axiosError.response?.data.message || 'Failed to update setting',
+        description: axiosError.response?.data.message || 'Failed to update setting',
         variant: 'destructive',
       });
     } finally {
       setIsSwitchLoading(false);
     }
   };
-  // Set profile URL
+
   useEffect(() => {
     if (session?.user) {
       const { username } = session.user as User;
@@ -180,11 +176,27 @@ function UserDashboard() {
         ) : (
           <RefreshCcw className="h-4 w-4" />
         )}
+        <span className="ml-2">Refresh</span>
       </Button>
 
       {/* Messages List */}
-  
-
+      <div className="mt-6">
+        {messages.length === 0 ? (
+          <p className="text-gray-500">No messages to display.</p>
+        ) : (
+        <ul className="space-y-2">
+          {messages.map((msg, idx) => (
+            <li
+              key={msg.id ?? idx}
+              className="border p-3 rounded shadow-sm bg-gray-50 text-sm"
+            >
+              <p>{msg.content}</p>
+              {msg.sender && <p className="text-xs text-gray-500">From: {msg.sender}</p>}
+            </li>
+          ))}
+        </ul>
+        )}
+      </div>
     </div>
   );
 }
