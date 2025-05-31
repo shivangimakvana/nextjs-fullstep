@@ -51,6 +51,7 @@ function UserDashboard() {
     }
   }, [setValue, toast]);
 
+  const [messages, setMessages] = useState<any[]>([]);
   // Fetch user messages
   const fetchMessages = useCallback(
     async (refresh = false) => {
