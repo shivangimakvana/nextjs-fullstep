@@ -7,9 +7,10 @@ import UserModel from '@/model/User';
 declare module 'next-auth' {
   interface Session {
     user: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
       _id: string;
-      email: string;
-      username: string;
     };
   }
 
