@@ -2,15 +2,15 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
-import { NextAuth } from 'next-auth';
 
 // Extend Session/User/JWT types
 declare module 'next-auth' {
   interface Session {
     user: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
       _id: string;
-      email: string;
-      username: string;
     };
   }
 
@@ -64,6 +64,7 @@ export const authOptions = {
         if (!isPasswordCorrect) return null;
 
         return {
+          id: user._id.toString(),
           _id: user._id.toString(),
           email: user.email,
           username: user.username,
@@ -77,7 +78,7 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: any; user?: any }) {
       if (user) {
         token._id = (user as AuthorizedUser)._id;
         token.email = user.email;
@@ -85,11 +86,10 @@ export const authOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: import("next-auth").Session; token: any }) {
       if (token && session.user) {
         session.user._id = token._id as string;
         session.user.email = token.email as string;
-        session.user.username = token.username as string;
       }
       return session;
     },
