@@ -2,23 +2,26 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../auth/[...nextauth]/options';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/model/User';
-import type { Session } from 'next-auth';
+import { User } from 'next-auth';
 
 export async function POST(request: Request) {
+  // Connect to the database
   await dbConnect();
 
-  const session = await getServerSession(authOptions) as Session | null;
-  if (!session?.user || !('user' in session)) {
+  const session = await getServerSession(authOptions);
+  const user: User = session?.user;
+  if (!session || !session.user) {
     return Response.json(
       { success: false, message: 'Not authenticated' },
       { status: 401 }
     );
   }
 
-  const userId = session.user._id;
+  const userId = user._id;
   const { acceptMessages } = await request.json();
 
   try {
+    // Update the user's message acceptance status
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
       { isAcceptingMessages: acceptMessages },
@@ -26,6 +29,7 @@ export async function POST(request: Request) {
     );
 
     if (!updatedUser) {
+      // User not found
       return Response.json(
         {
           success: false,
@@ -35,6 +39,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // Successfully updated message acceptance status
     return Response.json(
       {
         success: true,
@@ -52,11 +57,17 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+
+export async function GET(request: Request) {
+  // Connect to the database
   await dbConnect();
 
-  const session = await getServerSession(authOptions) as { user?: { _id: string } } | null;
-  if (!session || !session.user) {
+  // Get the user session
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
+
+  // Check if the user is authenticated
+  if (!session || !user) {
     return Response.json(
       { success: false, message: 'Not authenticated' },
       { status: 401 }
@@ -64,15 +75,18 @@ export async function GET() {
   }
 
   try {
-    const foundUser = await UserModel.findById(session.user._id);
+    // Retrieve the user from the database using the ID
+    const foundUser = await UserModel.findById(user._id);
 
     if (!foundUser) {
+      // User not found
       return Response.json(
         { success: false, message: 'User not found' },
         { status: 404 }
       );
     }
 
+    // Return the user's message acceptance status
     return Response.json(
       {
         success: true,
