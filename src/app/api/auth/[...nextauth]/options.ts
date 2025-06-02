@@ -19,7 +19,9 @@ declare module 'next-auth' {
     email: string;
     username: string;
   }
+}
 
+declare module 'next-auth/jwt' {
   interface JWT {
     _id: string;
     email: string;
@@ -78,18 +80,24 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: any; user?: any }) {
+    async jwt({ token, user }: { token: import('next-auth/jwt').JWT; user?: AuthorizedUser }) {
       if (user) {
-        token._id = (user as AuthorizedUser)._id;
-        token.email = user.email;
-        token.username = user.username;
+      token._id = (user as AuthorizedUser)._id;
+      token.email = user.email;
+      token.username = user.username;
       }
       return token;
     },
-    async session({ session, token }: { session: import("next-auth").Session; token: any }) {
+    async session({
+      session,
+      token,
+    }: {
+      session: import("next-auth").Session;
+      token: import("next-auth/jwt").JWT;
+    }): Promise<import("next-auth").Session> {
       if (token && session.user) {
-        session.user._id = token._id as string;
-        session.user.email = token.email as string;
+      session.user._id = token._id as string;
+      session.user.email = token.email as string;
       }
       return session;
     },
@@ -99,4 +107,4 @@ export const authOptions = {
   pages: {
     signIn: '/sign-in',
   },
-} satisfies Parameters<typeof NextAuth>[0]; // ✅ correct type assertion
+} 
