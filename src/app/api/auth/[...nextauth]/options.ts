@@ -107,4 +107,4 @@ export const authOptions = {
   pages: {
     signIn: '/sign-in',
   },
-} satisfies Parameters<typeof NextAuth>[0]; // ✅ correct type assertion
+} 
