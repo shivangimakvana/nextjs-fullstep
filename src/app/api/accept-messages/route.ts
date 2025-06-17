@@ -15,7 +15,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const userId = session.user._id;
   const userEmail = session.user.email;
   const { acceptMessages } = await request.json();
 
